@@ -2,6 +2,7 @@
     Spider L3S updater with Arduino Mega
     - Modified from "The Arduino CC3000 Firmware Upgrader write by Chris Magagna"
     - Host driver library modified from adafruit library to Spider_L3S library.
+    - Add automatic update option AY. 
 
     Leon Chao
 
@@ -920,6 +921,7 @@ void DisplayMenu(void) {
     Serial.println(F("    7Y - Copy MAC address and radio file from Arduino EEPROM to CC3000"));
     Serial.println(F("    8Y - Write new driver to CC3000"));
     Serial.println(F("    9Y - Write new firmware to CC3000"));
+    Serial.println(F("    AY - Automatic updater runs 0=>4Y=>6Y=>7Y=>8Y=>9Y=>0 options"));
 
     Serial.println();
     Serial.println();
@@ -957,6 +959,16 @@ void CommandProcessor(char *buffer) {
     }
     else if ((buffer[0]=='9') && (buffer[1]=='Y')) {
         WritePatch(false);
+    }
+    else if ((buffer[0]=='A') && (buffer[1]=='Y')) {
+        BasicCC30000Test();
+        GetCC3000Info(true);
+        WriteFAT();
+        CopyInfoToNVRAM();
+        WritePatch(true);
+        WritePatch(false);
+        delay(1000);        // Waiting for 1 sec then get cc3000 information.
+        BasicCC30000Test();
     }
     else {
         Serial.print(F("Unrecognized command \""));
